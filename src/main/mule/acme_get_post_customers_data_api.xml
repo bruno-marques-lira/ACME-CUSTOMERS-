@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+    <http:listener-config name="acme_get_post_customers_data_api-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+    <apikit:config name="acme_get_post_customers_data_api-config" api="acme_get_post_customers_data_api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <db:config name="Database_Config" doc:name="Database Config" doc:id="2bca419c-16cb-438a-974a-fe244e31633c" >
+		<db:oracle-connection host="localhost" user="system" password="welcome1" serviceName="xe" />
+	</db:config>
+	<flow name="acme_get_post_customers_data_api-main">
+        <http:listener config-ref="acme_get_post_customers_data_api-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="acme_get_post_customers_data_api-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="acme_get_post_customers_data_api-console">
+        <http:listener config-ref="acme_get_post_customers_data_api-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="acme_get_post_customers_data_api-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="get:\customerGet\(id):acme_get_post_customers_data_api-config">
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
+            <ee:variables>
+                <ee:set-variable variableName="id">attributes.uriParams.'id'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <set-variable value="#[message.attributes.uriParams.id]" doc:name="Set Variable" doc:id="86d3a122-b8d0-49ee-b355-9a43bdc3fc31" variableName="custId"/>
+		<logger level="INFO" message="get:\customerGet\(id):acme_get_post_customers_data_api-config" />
+		<db:select doc:name="Select" doc:id="362af7b6-4803-4ef6-86bf-c951c7b54bfd" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT CUST_ID, CUST_NAME, CUST_LASTNAME, CUST_MAIL, CUST_PHONE, CUST_ADDRESS1, CUST_ADDRESS2, CUST_ADDRESS3, CUST_NUMBER, CUST_CEP FROM ACME_CUSTOMER_TBL WHERE CUST_ID =:1]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'1':vars.custId}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="a8df3673-c92f-43d7-b265-fd9fc29268d8" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"CUST_ID": payload.CUST_ID[0],
+	"CUST_NAME": payload.CUST_NAME[0],
+	"CUST_LASTNAME": payload.CUST_LASTNAME[0],
+	"CUST_EMAIL": payload.CUST_EMAIL[0],
+	"CUST_PHONE": payload.CUST_PHONE[0],
+	"CUST_ADDRESS1": payload.CUST_ADDRESS1[0],
+	"CUST_ADDRESS2": payload.CUST_ADDRESS2[0],
+	"CUST_ADDRESS3": payload.CUST_ADDRESS3[0],
+	"CUST_NUMBER": payload.CUST_NUMBER[0],
+	"CUST_CEP": payload.CUST_CEP[0]
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+    </flow>
+    <flow name="post:\customerPost\:acme_get_post_customers_data_api-config">
+        <ee:transform doc:name="Transform Message" doc:id="daed8356-70d1-4755-af36-c8a8674a975f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"CUST_ID": payload.CUST_ID,
+	"CUST_NAME": payload.CUST_NAME,
+	"CUST_LASTNAME": payload.CUST_LASTNAME,
+	"CUST_EMAIL": payload.CUST_EMAIL,
+	"CUST_PHONE": payload.CUST_PHONE,
+	"ADDRESS1": payload.ADDRESS1,
+	"ADDRESS2": payload.ADDRESS2,
+	"ADDRESS3": payload.ADDRESS3,
+	"CUST_NUMBER": payload.CUST_NUMBER,
+	"CUST_CEP": payload.CUST_CEP
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<db:insert doc:name="Insert" doc:id="b1c6af7b-b8e2-4358-823c-415de975a3d1" config-ref="Database_Config">
+			<db:sql ><![CDATA[INSERT INTO ACME_CUSTOMER_TBL (CUST_ID, CUST_NAME, CUST_LASTNAME, CUST_MAIL, CUST_PHONE, CUST_ADDRESS1, CUST_ADDRESS2, CUST_ADDRESS3, CUST_NUMBER, CUST_CEP) VALUES(:1, :2, :3, :4, :5, :6, :7, :8, :9, :10)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'1':payload.CUST_ID, '2':payload.CUST_NAME, '3':payload.CUST_LASTNAME, '4':payload.CUST_EMAIL, '5':payload.CUST_PHONE, '6':payload.ADDRESS1, '7':payload.ADDRESS2, '8':payload.ADDRESS3, '9':payload.CUST_NUMBER, '10':payload.CUST_CEP}]]]></db:input-parameters>
+		</db:insert>
+		<logger level="INFO" message="Cliente Cadastrado com sucesso!" />
+		<ee:transform doc:name="Transform Message" doc:id="4adc675f-4cae-4754-bb2a-40b5d2e2caa0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message":"Cliente Cadastrado com Sucesso!"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+    </flow>
+</mule>

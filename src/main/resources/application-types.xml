@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="custId" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+    <types:type name="customerCollection" format="json">
+      <types:shape format="weave" example="examples/ACME_CUSTOMER_POST_EXAMPLE-2.json"><![CDATA[%dw 2.0
+
+type customerCollection = {|
+  CUST_ID: Number {"typeId": "int"}, 
+  CUST_NAME: String, 
+  CUST_LASTNAME: String, 
+  CUST_EMAIL: String, 
+  CUST_PHONE: String, 
+  CUST_ADDRESS1: String, 
+  CUST_ADDRESS2: String, 
+  CUST_ADDRESS3: String, 
+  CUST_NUMBER: String, 
+  CUST_CEP: String
+|} {"example": "{\\\"CUST_ID\\\":4,\\\"CUST_NAME\\\":\\\"Jos\u00E9\\\",\\\"CUST_LASTNAME\\\":\\\"Franco Rocha\\\",\\\"CUST_EMAIL\\\":\\\"jfranco@gmail.com\\\",\\\"CUST_PHONE\\\":\\\"950532325\\\",\\\"CUST_ADDRESS1\\\":\\\"Avenida das Alc\u00E1rias\\\",\\\"CUST_ADDRESS2\\\":\\\"\\\",\\\"CUST_ADDRESS3\\\":\\\"Jardim dos Palmares\\\",\\\"CUST_NUMBER\\\":\\\"801\\\",\\\"CUST_CEP\\\":\\\"02536050\\\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="message" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#86d3a122-b8d0-49ee-b355-9a43bdc3fc31">
+    <types:operation-declaration>
+      <types:inputs>
+        <types:parameter name="value" type="custId"/>
+      </types:inputs>
+    </types:operation-declaration>
+  </types:enrichment>
+  <types:enrichment select="#daed8356-70d1-4755-af36-c8a8674a975f">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="customerCollection"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="customerCollection"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#b1c6af7b-b8e2-4358-823c-415de975a3d1">
+    <types:operation-declaration>
+      <types:inputs>
+        <types:parameter name="inputParameters" type="customerCollection"/>
+      </types:inputs>
+    </types:operation-declaration>
+  </types:enrichment>
+  <types:enrichment select="#a8df3673-c92f-43d7-b265-fd9fc29268d8">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="customerCollection"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="customerCollection"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

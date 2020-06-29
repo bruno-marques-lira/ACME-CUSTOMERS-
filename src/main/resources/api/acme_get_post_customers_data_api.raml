@@ -1,0 +1,33 @@
+#%RAML 1.0
+title: ACME GET/POST Customer (DATA)
+
+types:
+ Customer:
+   type: object
+   properties:
+     CUST_ID:         integer
+     CUST_NAME:       string
+     CUST_LASTNAME:   string
+     CUST_MAIL:       string
+     CUST_PHONE:      string
+     ADDRESS1:        string
+     ADDRESS2:        string
+     ADDRESS3:        string
+     CUST_NUMBER:     string
+     CUST_CEP:        string
+
+/customerGet/{id}:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            type: Customer
+
+/customerPost/:
+  post:
+    responses:
+      200:
+        body:
+          application/json:
+            type: Customer
