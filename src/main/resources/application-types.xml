@@ -6,20 +6,20 @@
 type: string]]></types:shape>
     </types:type>
     <types:type name="customerCollection" format="json">
-      <types:shape format="weave" example="examples/ACME_CUSTOMER_POST_EXAMPLE-2.json"><![CDATA[%dw 2.0
+      <types:shape format="weave" example="examples/ACME_CUSTOMER_POST_EXAMPLE-3.json"><![CDATA[%dw 2.0
 
 type customerCollection = {|
   CUST_ID: Number {"typeId": "int"}, 
   CUST_NAME: String, 
   CUST_LASTNAME: String, 
-  CUST_EMAIL: String, 
+  CUST_MAIL: String, 
   CUST_PHONE: String, 
   CUST_ADDRESS1: String, 
   CUST_ADDRESS2: String, 
   CUST_ADDRESS3: String, 
   CUST_NUMBER: String, 
   CUST_CEP: String
-|} {"example": "{\\\"CUST_ID\\\":4,\\\"CUST_NAME\\\":\\\"Jos\u00E9\\\",\\\"CUST_LASTNAME\\\":\\\"Franco Rocha\\\",\\\"CUST_EMAIL\\\":\\\"jfranco@gmail.com\\\",\\\"CUST_PHONE\\\":\\\"950532325\\\",\\\"CUST_ADDRESS1\\\":\\\"Avenida das Alc\u00E1rias\\\",\\\"CUST_ADDRESS2\\\":\\\"\\\",\\\"CUST_ADDRESS3\\\":\\\"Jardim dos Palmares\\\",\\\"CUST_NUMBER\\\":\\\"801\\\",\\\"CUST_CEP\\\":\\\"02536050\\\"}"}
+|} {"example": "{\\\"CUST_ID\\\":4,\\\"CUST_NAME\\\":\\\"Jos\u00E9\\\",\\\"CUST_LASTNAME\\\":\\\"Franco Rocha\\\",\\\"CUST_MAIL\\\":\\\"jfranco@gmail.com\\\",\\\"CUST_PHONE\\\":\\\"950532325\\\",\\\"CUST_ADDRESS1\\\":\\\"Avenida das Alc\u00E1rias\\\",\\\"CUST_ADDRESS2\\\":\\\"\\\",\\\"CUST_ADDRESS3\\\":\\\"Jardim dos Palmares\\\",\\\"CUST_NUMBER\\\":\\\"801\\\",\\\"CUST_CEP\\\":\\\"02536050\\\"}"}
 
 ]]></types:shape>
     </types:type>
@@ -50,6 +50,13 @@ type: string]]></types:shape>
     </types:processor-declaration>
   </types:enrichment>
   <types:enrichment select="#b1c6af7b-b8e2-4358-823c-415de975a3d1">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="customerCollection"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
     <types:operation-declaration>
       <types:inputs>
         <types:parameter name="inputParameters" type="customerCollection"/>

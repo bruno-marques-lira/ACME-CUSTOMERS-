@@ -149,7 +149,7 @@ output application/json
 	"CUST_ID": payload.CUST_ID[0],
 	"CUST_NAME": payload.CUST_NAME[0],
 	"CUST_LASTNAME": payload.CUST_LASTNAME[0],
-	"CUST_EMAIL": payload.CUST_EMAIL[0],
+	"CUST_MAIL": payload.CUST_MAIL[0],
 	"CUST_PHONE": payload.CUST_PHONE[0],
 	"CUST_ADDRESS1": payload.CUST_ADDRESS1[0],
 	"CUST_ADDRESS2": payload.CUST_ADDRESS2[0],
@@ -170,19 +170,19 @@ output application/json
 	"CUST_ID": payload.CUST_ID,
 	"CUST_NAME": payload.CUST_NAME,
 	"CUST_LASTNAME": payload.CUST_LASTNAME,
-	"CUST_EMAIL": payload.CUST_EMAIL,
+	"CUST_MAIL": payload.CUST_MAIL,
 	"CUST_PHONE": payload.CUST_PHONE,
-	"ADDRESS1": payload.ADDRESS1,
-	"ADDRESS2": payload.ADDRESS2,
-	"ADDRESS3": payload.ADDRESS3,
+	"CUST_ADDRESS1": payload.CUST_ADDRESS1,
+	"CUST_ADDRESS2": payload.CUST_ADDRESS2,
+	"CUST_ADDRESS3": payload.CUST_ADDRESS3,
 	"CUST_NUMBER": payload.CUST_NUMBER,
 	"CUST_CEP": payload.CUST_CEP
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 		<db:insert doc:name="Insert" doc:id="b1c6af7b-b8e2-4358-823c-415de975a3d1" config-ref="Database_Config">
-			<db:sql ><![CDATA[INSERT INTO ACME_CUSTOMER_TBL (CUST_ID, CUST_NAME, CUST_LASTNAME, CUST_MAIL, CUST_PHONE, CUST_ADDRESS1, CUST_ADDRESS2, CUST_ADDRESS3, CUST_NUMBER, CUST_CEP) VALUES(:1, :2, :3, :4, :5, :6, :7, :8, :9, :10)]]></db:sql>
-			<db:input-parameters ><![CDATA[#[{'1':payload.CUST_ID, '2':payload.CUST_NAME, '3':payload.CUST_LASTNAME, '4':payload.CUST_EMAIL, '5':payload.CUST_PHONE, '6':payload.ADDRESS1, '7':payload.ADDRESS2, '8':payload.ADDRESS3, '9':payload.CUST_NUMBER, '10':payload.CUST_CEP}]]]></db:input-parameters>
+			<db:sql ><![CDATA[INSERT INTO ACME_CUSTOMER_TBL (CUST_ID, CUST_NAME, CUST_LASTNAME, CUST_MAIL, CUST_PHONE, CUST_ADDRESS1, CUST_ADDRESS2, CUST_ADDRESS3, CUST_NUMBER, CUST_CEP) VALUES(:CUST_ID, :CUST_NAME, :CUST_LASTNAME, :CUST_MAIL, :CUST_PHONE, :CUST_ADDRESS1, :CUST_ADDRESS2, :CUST_ADDRESS3, :CUST_NUMBER, :CUST_CEP)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'CUST_ID':payload.CUST_ID, 'CUST_NAME':payload.CUST_NAME, 'CUST_LASTNAME':payload.CUST_LASTNAME, 'CUST_MAIL':payload.CUST_MAIL, 'CUST_PHONE':payload.CUST_PHONE, 'CUST_ADDRESS1':payload.CUST_ADDRESS1, 'CUST_ADDRESS2':payload.CUST_ADDRESS2, 'CUST_ADDRESS3':payload.CUST_ADDRESS3, 'CUST_NUMBER':payload.CUST_NUMBER, 'CUST_CEP':payload.CUST_CEP}]]]></db:input-parameters>
 		</db:insert>
 		<logger level="INFO" message="Cliente Cadastrado com sucesso!" />
 		<ee:transform doc:name="Transform Message" doc:id="4adc675f-4cae-4754-bb2a-40b5d2e2caa0" >
